@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KitchenDesigner Pro</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links { display: flex; gap: 15px; align-items: center; }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.3);
+      color: #fff;
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 20px;
+      min-height: 90vh;
+    }
+
+    .hero h1 {
+      font-size: 60px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 40px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: #1a1a1a;
+      padding: 40px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal h2 { margin-bottom: 20px; }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .form-group input::placeholder { color: rgba(255,255,255,0.4); }
+
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .alert-success { background: #10b981; color: #fff; }
+    .alert-error { background: #ef4444; color: #fff; }
+
+    .close-modal {
+      float: right;
+      font-size: 28px;
+      font-weight: 700;
+      cursor: pointer;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .close-modal:hover { color: #fff; }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🍳 KitchenDesigner Pro</div>
+    <div class="nav-links" id="navLinks">
+      <button class="btn btn-outline" onclick="openModal('login')">Connexion</button>
+      <button class="btn btn-primary" onclick="openModal('register')">Inscription</button>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <h1>Créez votre cuisine <span>parfaite</span></h1>
+    <p>Outil de design 3D professionnel pour cuisines modernes</p>
+    <button class="btn btn-primary" style="padding: 16px 36px; font-size: 17px;" onclick="openModal('register')">
+      🎨 Commencer
+    </button>
+  </section>
+
+  <!-- MODAL CONNEXION -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('login')">&times;</span>
+      <h2>Connexion</h2>
+      <div id="loginError" class="alert"></div>
+      <form id="loginForm">
+        <div class="form-group">
+          <input type="email" id="loginEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Connexion</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL INSCRIPTION -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('register')">&times;</span>
+      <h2>Inscription</h2>
+      <div id="registerError" class="alert"></div>
+      <form id="registerForm">
+        <div class="form-group">
+          <input type="text" id="registerName" placeholder="Nom complet" required>
+        </div>
+        <div class="form-group">
+          <input type="email" id="registerEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="registerPassword" placeholder="Mot de passe" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Créer mon compte</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openModal(type) {
+      document.getElementById(type === 'login' ? 'loginModal' : 'registerModal').classList.add('active');
+    }
+
+    function closeModal(type) {
+      document.getElementById(type === 'login' ? 'loginModal' : 'registerModal').classList.remove('active');
+    }
+
+    function showAlert(id, message, type) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = message;
+      el.className = `alert alert-${type}`;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+    // INSCRIPTION
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('registerName').value.trim();
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showAlert('registerError', '✅ Compte créé !', 'success');
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setTimeout(() => {
+            closeModal('register');
+            updateNavAfterLogin(data.user);
+          }, 1500);
+        } else {
+          showAlert('registerError', data.error || 'Erreur lors de l\'inscription', 'error');
+        }
+      } catch (err) {
+        showAlert('registerError', 'Erreur de connexion au serveur', 'error');
+      }
+    });
+
+    // CONNEXION
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showAlert('loginError', '✅ Connecté !', 'success');
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setTimeout(() => {
+            closeModal('login');
+            updateNavAfterLogin(data.user);
+          }, 1500);
+        } else {
+          showAlert('loginError', data.error || 'Email ou mot de passe incorrect', 'error');
+        }
+      } catch (err) {
+        showAlert('loginError', 'Erreur de connexion au serveur', 'error');
+      }
+    });
+
+    function updateNavAfterLogin(user) {
+      const nav = document.getElementById('navLinks');
+      const initiale = user.name ? user.name[0].toUpperCase() : 'U';
+      nav.innerHTML = `
+        <span>${user.name}</span>
+        <button class="btn btn-primary">📐 Mon espace</button>
+        <button class="btn btn-outline" onclick="logout()">Déconnexion</button>
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      location.reload();
+    }
+
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try { updateNavAfterLogin(JSON.parse(savedUser)); } catch(e) {}
+    }
+  </script>
+</body>
+</html>

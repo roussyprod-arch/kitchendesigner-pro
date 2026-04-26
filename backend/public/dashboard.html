@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - KitchenDesigner Pro</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-right { display: flex; gap: 15px; align-items: center; }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: #fff;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.3);
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 50px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    .section {
+      margin-bottom: 60px;
+    }
+
+    .section h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(245,158,11,0.3);
+      padding-bottom: 10px;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .project-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .project-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #f59e0b;
+      transform: translateY(-5px);
+    }
+
+    .project-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #f59e0b;
+    }
+
+    .project-card p {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .project-date {
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .empty-state h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: #1a1a1a;
+      padding: 40px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-content h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert.success {
+      background: rgba(34,197,94,0.2);
+      border: 1px solid #22c55e;
+      color: #86efac;
+    }
+
+    .alert.error {
+      background: rgba(239,68,68,0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .alert.active { display: block; }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🏠 KitchenDesigner Pro</div>
+    <div class="nav-right">
+      <span id="userName" style="margin-right: 15px;"></span>
+      <button class="btn btn-outline" onclick="logout()">Déconnexion</button>
+    </div>
+  </nav>
+
+  <!-- CONTAINER -->
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Bienvenue ! 👋</h1>
+        <p style="color: rgba(255,255,255,0.6); margin-top: 5px;">Gérez vos projets de cuisine</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('newProject')" style="padding: 14px 28px; font-size: 16px;">
+        ➕ Nouveau Projet
+      </button>
+    </div>
+
+    <!-- ALERTE -->
+    <div id="alert" class="alert"></div>
+
+    <!-- SECTION PROJETS -->
+    <div class="section">
+      <h2>📐 Mes Projets</h2>
+      <div id="projectsList" class="projects-grid">
+        <div class="empty-state">
+          <h3>Aucun projet pour le moment</h3>
+          <p>Créez votre premier projet de cuisine !</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION COMMANDES -->
+    <div class="section">
+      <h2>📦 Mes Commandes</h2>
+      <div id="ordersList">
+        <div class="empty-state">
+          <h3>Aucune commande</h3>
+          <p>Vous n'avez pas encore commandé de matériaux</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL : NOUVEAU PROJET -->
+  <div id="newProject" class="modal">
+    <div class="modal-content">
+      <h2>Créer un nouveau projet</h2>
+      <div id="projectAlert" class="alert"></div>
+      <form id="projectForm">
+        <div class="form-group">
+          <label>Nom du projet</label>
+          <input type="text" id="projectName" placeholder="Ex: Cuisine Moderne" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="projectDescription" placeholder="Décrivez votre projet..."></textarea>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn btn-outline" onclick="closeModal('newProject')">Annuler</button>
+          <button type="submit" class="btn btn-primary">Créer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════
+    // VÉRIFIER CONNEXION
+    // ═══════════════════════════
+    const user = JSON.parse(localStorage.getItem('user'));
+    const token = localStorage.getItem('token');
+
+    if (!user || !token) {
+      alert('❌ Vous devez être connecté !');
+      window.location.href = '/';
+    }
+
+    document.getElementById('userName').textContent = `👤 ${user.name}`;
+
+    // ═══════════════════════════
+    // CHARGER LES PROJETS
+    // ═══════════════════════════
+    async function loadProjects() {
+      try {
+        const res = await fetch('/api/projects', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        const list = document.getElementById('projectsList');
+        
+        if (data.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <h3>Aucun projet pour le moment</h3>
+              <p>Créez votre premier projet de cuisine !</p>
+            </div>
+          `;
+        } else {
+          list.innerHTML = data.map(p => `
+            <div class="project-card" onclick="openProject('${p._id}')">
+              <h3>${p.name}</h3>
+              <p>${p.description || 'Sans description'}</p>
+              <div class="project-date">Créé le: ${new Date(p.createdAt).toLocaleDateString('fr-FR')}</div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Erreur:', err);
+      }
+    }
+
+    // ═══════════════════════════
+    // CRÉER UN PROJET
+    // ═══════════════════════════
+    document.getElementById('projectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('projectName').value.trim();
+      const description = document.getElementById('projectDescription').value.trim();
+
+      if (!name) {
+        showAlert('projectAlert', '❌ Le nom du projet est obligatoire', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name, description })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showAlert('projectAlert', '✅ Projet créé avec succès !', 'success');
+          document.getElementById('projectForm').reset();
+          setTimeout(() => {
+            closeModal('newProject');
+            loadProjects();
+          }, 1000);
+        } else {
+          showAlert('projectAlert', data.error || 'Erreur lors de la création', 'error');
+        }
+      } catch (err) {
+        showAlert('projectAlert', 'Erreur de connexion au serveur', 'error');
+      }
+    });
+
+    // ═══════════════════════════
+    // FONCTIONS UTILES
+    // ═══════════════════════════
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function showAlert(id, message, type) {
+      const alert = document.getElementById(id);
+      alert.textContent = message;
+      alert.className = `alert ${type} active`;
+      setTimeout(() => alert.classList.remove('active'), 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    }
+
+    function openProject(projectId) {
+      alert('🚧 Designer en construction !');
+      // TODO: Rediriger vers /designer.html?id=projectId
+    }
+
+    // CHARGER LES PROJETS AU DÉMARRAGE
+    loadProjects();
+  </script>
+</body>
+</html>
